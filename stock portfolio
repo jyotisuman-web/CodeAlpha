@@ -1,0 +1,64 @@
+import requests
+
+class StockPortfolio:
+    def __init__(self, api_key):
+        self.stocks = {}
+        self.api_key = api_key
+
+    def add_stock(self, symbol, quantity):
+        if symbol in self.stocks:
+            self.stocks[symbol] += quantity
+        else:
+            self.stocks[symbol] = quantity
+
+    def remove_stock(self, symbol, quantity):
+        if symbol in self.stocks:
+            if quantity >= self.stocks[symbol]:
+                del self.stocks[symbol]
+            else:
+                self.stocks[symbol] -= quantity
+
+    def get_portfolio_value(self):
+        total_value = 0
+        for symbol, quantity in self.stocks.items():
+            price = self.get_stock_price(symbol)
+            if price is not None:
+                total_value += price * quantity
+        return total_value
+
+    def get_stock_price(self, symbol):
+        url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={self.api_key}'
+        try:
+            response = requests.get(url)
+            data = response.json()
+            if 'Global Quote' in data:
+                return float(data['Global Quote']['05. price'])
+            else:
+                print(f"Error: Could not retrieve stock price for {symbol}.")
+                return None
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+    def get_company_overview(self, symbol):
+        url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={self.api_key}'
+        try:
+            response = requests.get(url)
+            data = response.json()
+            return data
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+
+api_key = 'JYPPGL9PLCOMIQ06'
+portfolio = StockPortfolio(api_key)
+portfolio.add_stock('AAPL', 10)
+portfolio.add_stock('GOOGL', 5)
+print("Portfolio value:", portfolio.get_portfolio_value())
+tell=input("To get overview of AApPL company write overview:")
+overview = portfolio.get_company_overview('AAPL')
+if overview:
+    print("Company Name:", overview.get('Name'))
+    print("Sector:", overview.get('Sector'))
+    print("Industry:", overview.get('Industry'))
+    print("CEO:", overview.get('CEO'))
+    print("Description:", overview.get('Description'))
