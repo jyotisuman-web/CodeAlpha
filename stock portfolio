@@ -49,7 +49,7 @@ class StockPortfolio:
             print(f"Error: {e}")
             return None
 
-api_key = 'JYPPGL9PLCOMIQ06'
+api_key = 'your api'
 portfolio = StockPortfolio(api_key)
 portfolio.add_stock('AAPL', 10)
 portfolio.add_stock('GOOGL', 5)
